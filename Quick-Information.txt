@@ -1,0 +1,30 @@
+1. Using LSOA codes, we can get geographic boundaries or centroid coordinates
+
+For the UK:
+LSOA (Lower-layer Super Output Area) codes are tied to shapefiles from the Office for National Statistics (ONS).
+Each LSOA has a defined polygon boundary (GeoJSON/Shapefile).
+You can extract the centroid (lat/lon) and join it to your dataset.
+
+2. To update the requirements.txt automatically
+pip freeze > requirements.txt
+
+3. python.exe -m pip install --upgrade pip
+
+4. 
+
+
+
+
+
+Steps for FFP:
+1. Executable File
+
+2. If not automatically packaged, install packages using requirements.txt
+
+3. LSOA GeoJSON file download from:
+https://geoportal.statistics.gov.uk/datasets/ons%3A%3Alower-layer-super-output-areas-december-2021-boundaries-ew-bsc-v4-2/about?utm_source=chatgpt.com
+
+4. WARD GeoJSON file download from:
+https://www.data.gov.uk/dataset/e8493e3d-619e-4362-aa3a-0a3538177da8/wards-december-2024-boundaries-uk-bgc?utm_source=chatgpt.com
+
+5. 
