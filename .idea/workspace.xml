@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eab32074-a76c-4442-8a76-a3bf98a13a11" name="Changes" comment="Committing both the main and pyqt5UI python files">
-      <change afterPath="$PROJECT_DIR$/ward-spatial-mapping-old.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Ward_Info.xlsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyqt5UI-chart-with-map.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyqt5UI-chart-with-map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ward-geospatial-mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/ward-geospatial-mapping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ward_map.html" beforeDir="false" afterPath="$PROJECT_DIR$/ward_map.html" afterDir="false" />
-    </list>
+    <list default="true" id="eab32074-a76c-4442-8a76-a3bf98a13a11" name="Changes" comment="Committing both the main and pyqt5UI along with Geo spatial mapping working with right geojson mapping" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,7 +107,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759855994155</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Committing both the main and pyqt5UI along with Geo spatial mapping working with right geojson mapping">
+      <option name="closed" value="true" />
+      <created>1760304363553</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1760304363553</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -122,6 +123,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Committing both the main and pyqt5UI python files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Committing both the main and pyqt5UI python files" />
+    <MESSAGE value="Committing both the main and pyqt5UI along with Geo spatial mapping working with right geojson mapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="Committing both the main and pyqt5UI along with Geo spatial mapping working with right geojson mapping" />
   </component>
 </project>
