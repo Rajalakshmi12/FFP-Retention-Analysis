@@ -5,7 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eab32074-a76c-4442-8a76-a3bf98a13a11" name="Changes" comment="Committing both the main and pyqt5UI python files">
+      <change afterPath="$PROJECT_DIR$/ward-spatial-mapping-old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ward_Info.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyqt5UI-chart-with-map.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyqt5UI-chart-with-map.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ward-geospatial-mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/ward-geospatial-mapping.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ward_map.html" beforeDir="false" afterPath="$PROJECT_DIR$/ward_map.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,22 +51,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.check_data.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pyqt5UI-1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pyqt5UI-2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pyqt5UI-chart-2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pyqt5UI-chatgpt-3.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pyqt5UI.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ward-geospatial-mapping.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.check_data.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.pyqt5UI-1.executor": "Run",
+    "Python.pyqt5UI-2.executor": "Run",
+    "Python.pyqt5UI-chart-2.executor": "Run",
+    "Python.pyqt5UI-chart-with-map.executor": "Run",
+    "Python.pyqt5UI-chatgpt-3.executor": "Run",
+    "Python.pyqt5UI.executor": "Run",
+    "Python.ward-geospatial-mapping.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\poort\PycharmProjects\FFP-Data-Analysis-2025" />
@@ -70,8 +76,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PY-251.26094.141" />
-        <option value="bundled-python-sdk-9f8e2b94138c-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26094.141" />
+        <option value="bundled-python-sdk-495700d161d3-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.22562.220" />
       </set>
     </attachedChunks>
   </component>
@@ -101,7 +106,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759674736623</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Committing both the main and pyqt5UI python files">
+      <option name="closed" value="true" />
+      <created>1759855994155</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1759855994155</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
