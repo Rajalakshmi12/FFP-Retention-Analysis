@@ -1,33 +1,52 @@
 import tkinter as tk
 from tkinter import ttk
-import matplotlib.pyplot as plt
+import subprocess
+import sys
+import os
 
-# Get the
+# Function to run a child Python file
+def run_script(script_name):
+    # Get absolute path
+    script_path = os.path.join(os.path.dirname(__file__), script_name)
 
-# Dummy function for chart display (replace with actual logic)
-def show_chart(label):
-    plt.figure()
-    plt.title(f"{label} - Weekly Retention")
-    plt.plot([1, 2, 3, 4], [4, 5, 6, 7])  # Replace with actual data
-    plt.xlabel("Week")
-    plt.ylabel("Users")
-    plt.grid(True)
-    plt.show()
+    if os.path.exists(script_path):
+        root.destroy()  # close main launcher before opening next window
+        subprocess.run([sys.executable, script_path])
+    else:
+        tk.messagebox.showerror("Error", f"Script not found:\n{script_name}")
 
-# GUI setup
+# -----------------------------
+# MAIN DASHBOARD WINDOW
+# -----------------------------
 root = tk.Tk()
-root.title("Retention Analysis")
-root.geometry("300x250")
+root.title("Retention & Heatmap Dashboard")
+root.geometry("500x300")
+root.resizable(False, False)
 
-# Define 4 buttons
-buttons = {
-    "Once a Week": lambda: show_chart("Once"),
-    "Twice a Week": lambda: show_chart("Twice"),
-    "Thrice a Week": lambda: show_chart("Thrice"),
-    "Seven Days a Week": lambda: show_chart("Seven")
-}
+frame = ttk.Frame(root, padding=20)
+frame.pack(expand=True, fill="both")
 
-for label, command in buttons.items():
-    ttk.Button(root, text=label, command=command).pack(pady=10)
+title = ttk.Label(frame, text="Select an Option", font=("Arial", 18))
+title.pack(pady=30)
+
+# Buttons for both apps
+btn1 = ttk.Button(
+    frame,
+    text="🧮 Retention Percentage Calculation",
+    command=lambda: run_script("pyqt5UI-chart-with-map.py"),
+    width=40
+)
+btn1.pack(pady=15)
+
+btn2 = ttk.Button(
+    frame,
+    text="🌡️ Heat Map Generation",
+    command=lambda: run_script("Engagement_Analysis.py"),
+    width=40
+)
+btn2.pack(pady=15)
+
+# Optional: Exit button
+ttk.Button(frame, text="❌ Exit", command=root.destroy).pack(pady=20)
 
 root.mainloop()

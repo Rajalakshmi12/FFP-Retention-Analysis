@@ -73,7 +73,7 @@ class RetentionApp(QWidget):
 
         # Load data
         # df = pd.read_excel("Mar24_Mar25.xlsx", sheet_name="UI-Sheet")
-        df = pd.read_excel("Documents/Mar24_Mar25_Cleansed.xlsx", sheet_name="Sheet1")
+        df = pd.read_excel("Documents/Mar24_Mar25_Cleansed.xlsx", sheet_name="Main")
         df.rename(columns=lambda x: x.strip(), inplace=True)
         df["Date"] = pd.to_datetime(df["Date"])
         df["Week"] = df["Date"].dt.isocalendar().week
