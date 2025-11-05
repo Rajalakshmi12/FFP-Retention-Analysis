@@ -26,7 +26,7 @@ root.resizable(False, False)
 frame = ttk.Frame(root, padding=20)
 frame.pack(expand=True, fill="both")
 
-title = ttk.Label(frame, text="Select an Option", font=("Arial", 18))
+title = ttk.Label(frame, text="FFP Analysis", font=("Arial", 18))
 title.pack(pady=30)
 
 # Buttons for both apps
@@ -47,6 +47,6 @@ btn2 = ttk.Button(
 btn2.pack(pady=15)
 
 # Optional: Exit button
-ttk.Button(frame, text="❌ Exit", command=root.destroy).pack(pady=20)
+ttk.Button(frame, text="❌ Exit", command=root.destroy).pack(pady=18)
 
 root.mainloop()
