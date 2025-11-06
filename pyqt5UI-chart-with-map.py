@@ -9,7 +9,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
-
+# Raji add Raji New columm Age and Range by python - Important
 def make_excel_icon(size=32):
     """Draw an Excel-like icon (two-tone green + white X + grid lines)."""
     pixmap = QPixmap(size, size)
