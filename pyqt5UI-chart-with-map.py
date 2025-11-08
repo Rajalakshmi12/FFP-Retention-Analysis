@@ -89,9 +89,6 @@ class RetentionApp(QWidget):
         self.result_label.setMinimumHeight(60)
         self.layout.addWidget(self.result_label)
 
-        # ---------- Charts Section ----------
-        self.add_charts(self.layout, self.df)
-
         # ---------- Run Geospatial Mapping Button ----------
         self.run_geo_btn = QPushButton("Run Ward Geospatial Mapping")
         self.run_geo_btn.setStyleSheet("""
@@ -111,6 +108,10 @@ class RetentionApp(QWidget):
 
         self.set_and_run(4, self.session_buttons[3])
 
+        # ---------- Charts Section ----------
+        self.layout.addSpacing(25)
+        self.add_charts(self.layout, self.df)
+
     # ---------- Chart Function ----------
     def add_charts(self, layout, df):
         # Helper function to rotate and align x-axis labels safely
@@ -119,19 +120,19 @@ class RetentionApp(QWidget):
                 label.set_rotation(45)
                 label.set_ha('right')
 
-        # 1. Gender by Programme
+        # 1. Gender by Activity Type
         fig1, ax1 = plt.subplots(figsize=(10, 5))
         data1 = df.groupby(["Activity type", "Gender"]).size().unstack(fill_value=0)
         data1.plot(kind="bar", stacked=True, ax=ax1)
-        ax1.set_title("Gender Distribution by Programme (Activity Type)")
-        ax1.set_xlabel("Programme (Activity Type)")
+        ax1.set_title("Gender Distribution by Activity Type")
+        ax1.set_xlabel("Activity Type")
         ax1.set_ylabel("Number of Participants")
         rotate_labels(ax1)
         fig1.tight_layout()
         fig1.subplots_adjust(bottom=0.25)
         layout.addWidget(FigureCanvas(fig1))
 
-        # 2. Age by Programme
+        # 2. Age by Activity
         fig2, ax2 = plt.subplots(figsize=(10, 5))
         df_age = df.dropna(subset=["RajiNewColumn-Age"]).copy()
         df_age["Age Range"] = pd.cut(
@@ -141,32 +142,32 @@ class RetentionApp(QWidget):
         )
         data2 = df_age.groupby(["Activity type", "Age Range"]).size().unstack(fill_value=0)
         data2.plot(kind="bar", stacked=True, ax=ax2)
-        ax2.set_title("Age Distribution by Programme")
-        ax2.set_xlabel("Programme (Activity Type)")
+        ax2.set_title("Age Distribution by Activity Type")
+        ax2.set_xlabel("Activity Type")
         ax2.set_ylabel("Number of Participants")
         rotate_labels(ax2)
         fig2.tight_layout()
         fig2.subplots_adjust(bottom=0.25)
         layout.addWidget(FigureCanvas(fig2))
 
-        # 3. Programme Participation Volume
+        # 3. Activity Participation Volume
         fig3, ax3 = plt.subplots(figsize=(10, 5))
         df["Activity type"].value_counts().plot(kind="bar", ax=ax3, color="orange")
-        ax3.set_title("Programme Participation Volume")
-        ax3.set_xlabel("Programme (Activity Type)")
+        ax3.set_title("Activity Participation Volume")
+        ax3.set_xlabel("Activity Type")
         ax3.set_ylabel("Count")
         rotate_labels(ax3)
         fig3.tight_layout()
         fig3.subplots_adjust(bottom=0.25)
         layout.addWidget(FigureCanvas(fig3))
 
-        # 4. Constituency by Programme
+        # 4. Constituency by Activity Type
         fig4, ax4 = plt.subplots(figsize=(10, 5))
         data4 = df.groupby(["Activity type", "Constituency"]).size().unstack(fill_value=0)
         top_cols = data4.sum().sort_values(ascending=False).head(8).index
         data4[top_cols].plot(kind="bar", stacked=True, ax=ax4)
-        ax4.set_title("Top Constituencies by Programme")
-        ax4.set_xlabel("Programme (Activity Type)")
+        ax4.set_title("Top Constituencies by Activity Type")
+        ax4.set_xlabel("Activity Type")
         ax4.set_ylabel("Number of Participants")
         rotate_labels(ax4)
         fig4.tight_layout()
@@ -207,15 +208,37 @@ class RetentionApp(QWidget):
         self.last_df_eligible = df_eligible
 
     def generate_excel(self, dynamic_sessions):
+        # Recalculate retention for the chosen session threshold
         self.calc_retention(dynamic_sessions)
         retained = getattr(self, "last_retained", set())
         df_eligible = getattr(self, "last_df_eligible", self.df)
+
+        # Prepare export folder
         folder = "Retention Excels"
         os.makedirs(folder, exist_ok=True)
         export_file = os.path.join(folder, f"retention_report_{dynamic_sessions}.xlsx")
+
+        # Filter retained participants
         df_retained = df_eligible[df_eligible["Attendee ID"].isin(retained)]
-        grouped = df_retained.groupby("Attendee ID")["Activity type"].apply(lambda x: ", ".join(sorted(set(x)))).reset_index()
-        grouped.to_excel(export_file, index=False)
+
+        # Select relevant columns
+        export_cols = [
+            "Attendee ID",
+            "Gender",
+            "RajiNewColumn-Age",
+            "Date",
+            "Activity type"
+        ]
+        available_cols = [c for c in export_cols if c in df_retained.columns]
+        df_export = df_retained[available_cols].copy()
+
+        # Optional: sort by Attendee ID and Date
+        df_export.sort_values(by=["Attendee ID", "Date"], inplace=True)
+
+        # Export to Excel
+        df_export.to_excel(export_file, index=False)
+
+        # Auto-open file
         if sys.platform == "win32":
             os.startfile(export_file)
         elif sys.platform == "darwin":

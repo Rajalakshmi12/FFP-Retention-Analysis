@@ -42,7 +42,7 @@ def show_summary():
 # MAIN DASHBOARD UI
 # ----------------------------------------------------
 root = tk.Tk()
-root.title("Retention & Heatmap Dashboard")
+root.title("Fight For Peace Analysis Dashboard")
 root.geometry("600x550")
 root.resizable(False, False)
 
@@ -65,15 +65,16 @@ btn3 = ttk.Button(frame, text="📉  Dropout Trend Analysis",
                   width=50)
 btn3.pack(pady=10)
 
-btn4 = ttk.Button(frame, text="🧾  Generate Summary",
+btn4 = ttk.Button(frame, text="🧾  Generate Summary - Last 2 months",
                   command=show_summary, width=50)
 btn4.pack(pady=10)
 
 summary_box = scrolledtext.ScrolledText(frame, wrap=tk.WORD, width=70, height=12, font=("Consolas", 10))
 summary_box.pack(pady=10)
-summary_box.insert(tk.END, "Click '🧾 Generate Summary' to view the latest 12-month trends here...")
+summary_box.insert(tk.END, "Click 'Generate Summary' to view the latest 2 months trends here...")
 summary_box.config(state="disabled")
 
 ttk.Button(frame, text="❌ Exit", command=root.destroy).pack(pady=10)
 
 root.mainloop()
+
