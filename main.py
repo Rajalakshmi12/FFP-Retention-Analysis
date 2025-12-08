@@ -8,6 +8,9 @@ from tkinter import ttk, messagebox, scrolledtext
 import subprocess
 import sys
 import os
+
+from fontTools.cffLib.specializer import commandsToProgram
+
 sys.path.append(os.path.dirname(__file__))  # ensures current folder is visible
 from trend_summary import generate_trend_summary   # 👈 import summary logic
 

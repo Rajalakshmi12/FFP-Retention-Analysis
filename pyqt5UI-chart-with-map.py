@@ -3,263 +3,321 @@ import os
 import pandas as pd
 from PyQt5.QtCore import QSize, Qt, QProcess
 from PyQt5.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QScrollArea
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QLabel, QScrollArea, QFrame, QSizePolicy
 )
-from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QFont
+
+from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QFont, QBrush
+
+
+# NEW: Matplotlib imports for charting
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
-# Raji add Raji New columm Age and Range by python - Important
+
 def make_excel_icon(size=32):
-    """Draw an Excel-like icon (two-tone green + white X + grid lines)."""
     pixmap = QPixmap(size, size)
     pixmap.fill(Qt.transparent)
-    painter = QPainter(pixmap)
-    painter.fillRect(0, 0, size // 2, size, QColor("#107C41"))
-    painter.fillRect(size // 2, 0, size // 2, size, QColor("#185C37"))
-    painter.setPen(QColor(200, 255, 200))
-    step = size // 4
-    for i in range(1, 4):
-        painter.drawLine(i * step, 0, i * step, size)
-        painter.drawLine(0, i * step, size, i * step)
-    painter.setPen(Qt.white)
-    font = QFont("Arial", int(size * 0.6), QFont.Bold)
-    painter.setFont(font)
-    painter.drawText(pixmap.rect(), Qt.AlignCenter, "X")
-    painter.end()
-    return QIcon(pixmap)
 
+    p = QPainter(pixmap)
+
+    # use QBrush for colors
+    p.fillRect(0, 0, size//2, size, QBrush(QColor("#107C41")))
+    p.fillRect(size//2, 0, size//2, size, QBrush(QColor("#185C37")))
+
+    p.setPen(Qt.white)
+    p.setFont(QFont("Arial", int(size*0.6), QFont.Bold))
+    p.drawText(pixmap.rect(), Qt.AlignCenter, "X")
+    p.end()
+
+    return QIcon(pixmap)
 
 class RetentionApp(QWidget):
     def __init__(self):
         super().__init__()
-        self.selected_sessions = 4
-        self.session_buttons = []
+
         self.geo_process = None
+        self.session_buttons = []
 
         self.setWindowTitle("FFP Retention & Engagement Dashboard")
 
-        # ---------- Scrollable main layout ----------
-        scroll = QScrollArea(self)
+        # ---------------- SCROLL AREA ----------------
+        scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        container = QWidget()
-        self.layout = QVBoxLayout(container)
-        scroll.setWidget(container)
-        main_layout = QVBoxLayout(self)
-        main_layout.addWidget(scroll)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        # ---------- Load data ----------
+        container = QWidget()
+        container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.layout = QVBoxLayout(container)
+        self.layout.setContentsMargins(20, 10, 20, 10)
+        self.layout.setSpacing(10)
+
+        scroll.setWidget(container)
+
+        main = QVBoxLayout(self)
+        main.addWidget(scroll)
+
+        # ---------------- LOAD DATA ----------------
         df = pd.read_excel("Documents/Mar24_Mar25_Cleansed.xlsx", sheet_name="Main")
-        df.rename(columns=lambda x: x.strip(), inplace=True)
-        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-        df["Week"] = df["Date"].dt.isocalendar().week
+        df["Date"] = pd.to_datetime(df["Date"])
         self.df = df
 
-        # ---------- Buttons Row ----------
-        button_row_widget = QWidget()
-        button_row_layout = QHBoxLayout(button_row_widget)
-        button_row_layout.setContentsMargins(0, 0, 0, 0)
-        button_row_layout.setSpacing(5)
-        excel_icon = make_excel_icon(28)
+        # ---------------- TITLE ----------------
+        title = QLabel("Select session count for retention calculation (monthly):")
+        title.setStyleSheet("font-size: 11pt; margin-bottom: 4px;")
+        self.layout.addWidget(title)
+
+        # ---------------- BUTTON ROW ----------------
+        row = QWidget()
+        row_layout = QHBoxLayout(row)
+        row_layout.setSpacing(5)
+        row_layout.setContentsMargins(0, 0, 0, 0)
+
+        excel_icon = make_excel_icon(22)
 
         for i in range(1, 11):
-            vbox = QVBoxLayout()
-            vbox.setSpacing(2)
-            num_btn = QPushButton(str(i))
-            num_btn.setFixedSize(QSize(70, 35))
-            num_btn.clicked.connect(lambda _, count=i, b=num_btn: self.set_and_run(count, b))
-            self.session_buttons.append(num_btn)
-            vbox.addWidget(num_btn, alignment=Qt.AlignHCenter)
-            excel_btn = QPushButton()
-            excel_btn.setIcon(excel_icon)
-            excel_btn.setIconSize(QSize(20, 20))
-            excel_btn.setFixedSize(QSize(26, 26))
-            excel_btn.setStyleSheet("background: transparent; border: none;")
-            excel_btn.clicked.connect(lambda _, count=i: self.generate_excel(count))
-            vbox.addWidget(excel_btn, alignment=Qt.AlignHCenter)
-            button_row_layout.addLayout(vbox)
+            col = QVBoxLayout()
+            col.setSpacing(0)
+            col.setContentsMargins(0, 0, 0, 0)
 
-        self.layout.addWidget(QLabel("Select session count for retention calculation (monthly):"))
-        self.layout.addWidget(button_row_widget)
+            btn = QPushButton(str(i))
+            btn.setFixedSize(48, 26)
+            btn.clicked.connect(lambda _, v=i, b=btn: self.set_and_run(v, b))
+            self.session_buttons.append(btn)
+            col.addWidget(btn, alignment=Qt.AlignCenter)
 
-        # ---------- Retention summary ----------
+            ex = QPushButton()
+            ex.setIcon(excel_icon)
+            ex.setFixedSize(22, 22)
+            ex.setStyleSheet("background:none; border:none;")
+            ex.clicked.connect(lambda _, v=i: self.generate_excel(v))
+            col.addWidget(ex, alignment=Qt.AlignCenter)
+
+            row_layout.addLayout(col)
+
+        self.layout.addWidget(row)
+
+        # ---------------- RETENTION RESULT ----------------
         self.result_label = QLabel("")
-        self.result_label.setStyleSheet("font-size: 16pt; font-weight: bold; color: #003366;")
-        self.result_label.setWordWrap(True)
-        self.result_label.setMinimumHeight(60)
+        self.result_label.setStyleSheet("font-size: 13pt; font-weight:bold; color:#003366;")
         self.layout.addWidget(self.result_label)
 
-        # ---------- Run Geospatial Mapping Button ----------
-        self.run_geo_btn = QPushButton("Run Ward Geospatial Mapping")
-        self.run_geo_btn.setStyleSheet("""
+        # ---------------- GEO BUTTON ----------------
+        self.geo_btn = QPushButton("Run Ward Geospatial Mapping")
+        self.geo_btn.setFixedHeight(38)
+        self.geo_btn.setStyleSheet("""
             QPushButton {
-                background-color: #185C37;
-                color: white;
-                font-weight: bold;
-                padding: 8px;
-            }
-            QPushButton:disabled {
-                background-color: #555555;
-                color: #dddddd;
+                background-color:#185C37; 
+                color:white; 
+                font-size:12pt;
+                border-radius:4px;
             }
         """)
-        self.run_geo_btn.clicked.connect(self.run_geospatial)
-        self.layout.addWidget(self.run_geo_btn, alignment=Qt.AlignCenter)
+        self.geo_btn.clicked.connect(self.launch_geospatial)
+        self.layout.addWidget(self.geo_btn, alignment=Qt.AlignCenter)
 
+        # ---------------- GAP SECTION ----------------
+        self.add_gap_section()
+
+        # Fix bottom space
+        self.layout.addStretch(0)
+
+        # Default selection
         self.set_and_run(4, self.session_buttons[3])
 
-        # ---------- Charts Section ----------
-        self.layout.addSpacing(25)
-        self.add_charts(self.layout, self.df)
-
-    # ---------- Chart Function ----------
-    def add_charts(self, layout, df):
-        # Helper function to rotate and align x-axis labels safely
-        def rotate_labels(ax):
-            for label in ax.get_xticklabels():
-                label.set_rotation(45)
-                label.set_ha('right')
-
-        # 1. Gender by Activity Type
-        fig1, ax1 = plt.subplots(figsize=(10, 5))
-        data1 = df.groupby(["Activity type", "Gender"]).size().unstack(fill_value=0)
-        data1.plot(kind="bar", stacked=True, ax=ax1)
-        ax1.set_title("Gender Distribution by Activity Type")
-        ax1.set_xlabel("Activity Type")
-        ax1.set_ylabel("Number of Participants")
-        rotate_labels(ax1)
-        fig1.tight_layout()
-        fig1.subplots_adjust(bottom=0.25)
-        layout.addWidget(FigureCanvas(fig1))
-
-        # 2. Age by Activity
-        fig2, ax2 = plt.subplots(figsize=(10, 5))
-        df_age = df.dropna(subset=["RajiNewColumn-Age"]).copy()
-        df_age["Age Range"] = pd.cut(
-            df_age["RajiNewColumn-Age"],
-            bins=[0, 12, 17, 22, 30, 40, 100],
-            labels=["0–12", "13–17", "18–22", "23–30", "31–40", "40+"],
-        )
-        data2 = df_age.groupby(["Activity type", "Age Range"]).size().unstack(fill_value=0)
-        data2.plot(kind="bar", stacked=True, ax=ax2)
-        ax2.set_title("Age Distribution by Activity Type")
-        ax2.set_xlabel("Activity Type")
-        ax2.set_ylabel("Number of Participants")
-        rotate_labels(ax2)
-        fig2.tight_layout()
-        fig2.subplots_adjust(bottom=0.25)
-        layout.addWidget(FigureCanvas(fig2))
-
-        # 3. Activity Participation Volume
-        fig3, ax3 = plt.subplots(figsize=(10, 5))
-        df["Activity type"].value_counts().plot(kind="bar", ax=ax3, color="orange")
-        ax3.set_title("Activity Participation Volume")
-        ax3.set_xlabel("Activity Type")
-        ax3.set_ylabel("Count")
-        rotate_labels(ax3)
-        fig3.tight_layout()
-        fig3.subplots_adjust(bottom=0.25)
-        layout.addWidget(FigureCanvas(fig3))
-
-        # 4. Constituency by Activity Type
-        fig4, ax4 = plt.subplots(figsize=(10, 5))
-        data4 = df.groupby(["Activity type", "Constituency"]).size().unstack(fill_value=0)
-        top_cols = data4.sum().sort_values(ascending=False).head(8).index
-        data4[top_cols].plot(kind="bar", stacked=True, ax=ax4)
-        ax4.set_title("Top Constituencies by Activity Type")
-        ax4.set_xlabel("Activity Type")
-        ax4.set_ylabel("Number of Participants")
-        rotate_labels(ax4)
-        fig4.tight_layout()
-        fig4.subplots_adjust(bottom=0.25)
-        layout.addWidget(FigureCanvas(fig4))
-
-    # ---------- Retention & Utilities ----------
+    # ---------------------------------------------------------
+    # RETENTION LOGIC
+    # ---------------------------------------------------------
     def set_and_run(self, val, btn):
         for b in self.session_buttons:
             b.setStyleSheet("")
-        btn.setStyleSheet("background-color: green; color: white;")
-        self.selected_sessions = val
+        btn.setStyleSheet("background-color:green; color:white;")
         self.calc_retention(val)
 
-    def calc_retention(self, dynamic_sessions):
-        latest_date = self.df["Date"].max()
-        cutoff = latest_date - pd.DateOffset(months=2)
-        eligible = self.df.groupby("Attendee ID")["Date"].min()
-        eligible_ids = eligible[eligible < cutoff].index
-        df_eligible = self.df[self.df["Attendee ID"].isin(eligible_ids)].copy()
-        df_eligible["Month"] = df_eligible["Date"].dt.to_period("M")
+    def calc_retention(self, sessions):
+        df = self.df.copy()
+        latest = df["Date"].max()
+        cutoff = latest - pd.DateOffset(months=2)
 
-        month_counts = df_eligible.groupby(["Attendee ID", "Month"]).size().reset_index(name="count")
-        latest = month_counts["Month"].max()
-        prev = latest - 1
-        active_last_two = set(month_counts[month_counts["Month"].isin([prev, latest])]["Attendee ID"])
-        retained = set(
-            month_counts[(month_counts["Month"] == latest) & (month_counts["count"] >= dynamic_sessions)]["Attendee ID"]
-        ) & set(
-            month_counts[(month_counts["Month"] == prev) & (month_counts["count"] >= dynamic_sessions)]["Attendee ID"]
+        eligible = df.groupby("Attendee ID")["Date"].min()
+        ids = eligible[eligible < cutoff].index
+
+        df2 = df[df["Attendee ID"].isin(ids)].copy()
+        df2["Month"] = df2["Date"].dt.to_period("M")
+
+        m = df2.groupby(["Attendee ID", "Month"]).size().reset_index(name="count")
+
+        last = m["Month"].max()
+        prev = last - 1
+
+        active = set(m[m["Month"].isin([prev, last])]["Attendee ID"])
+        retained = (
+            set(m[(m["Month"] == last) & (m["count"] >= sessions)]["Attendee ID"])
+            & set(m[(m["Month"] == prev) & (m["count"] >= sessions)]["Attendee ID"])
         )
-        pct = round(len(retained) / len(active_last_two) * 100, 2) if len(active_last_two) > 0 else 0
-        self.result_label.setText(
-            f"{len(retained)} out of {len(active_last_two)} participants in the last two months "
-            f"had ≥{dynamic_sessions} sessions ({pct}%)."
-        )
-        self.last_retained = retained
-        self.last_df_eligible = df_eligible
 
-    def generate_excel(self, dynamic_sessions):
-        # Recalculate retention for the chosen session threshold
-        self.calc_retention(dynamic_sessions)
-        retained = getattr(self, "last_retained", set())
-        df_eligible = getattr(self, "last_df_eligible", self.df)
+        pct = round(100 * len(retained) / len(active), 2) if active else 0
+        self.result_label.setText(f"{len(retained)} of {len(active)} participants had ≥{sessions} sessions ({pct}%).")
 
-        # Prepare export folder
-        folder = "Retention Excels"
+    # ---------------------------------------------------------
+    # GAP SECTION (UPDATED WITH VISUALIZATION)
+    # ---------------------------------------------------------
+    def add_gap_section(self):
+        frame = QFrame()
+        lay = QVBoxLayout(frame)
+        lay.setSpacing(8)
+        lay.setContentsMargins(10, 5, 10, 5)
+
+        title = QLabel("Attendance Gap Analysis")
+        title.setStyleSheet("font-size: 13pt; font-weight: bold; color:#660000;")
+        lay.addWidget(title)
+
+        df = self.df.sort_values(["Attendee ID", "Date"])
+        df["Prev"] = df.groupby("Attendee ID")["Date"].shift(1)
+        df["Gap"] = (df["Date"] - df["Prev"]).dt.days
+
+        # Identify gap attendees
+        gap3 = df[df["Gap"] > 90].groupby("Attendee ID")["Gap"].max().sort_values(ascending=False)
+        gap6 = df[df["Gap"] > 180].groupby("Attendee ID")["Gap"].max().sort_values(ascending=False)
+
+        # --- Summary counts ---
+        summary = QLabel(f">3-month gaps: {len(gap3)}    |    >6-month gaps: {len(gap6)}")
+        summary.setStyleSheet("font-size: 11pt; font-weight:bold;")
+        lay.addWidget(summary)
+
+        # --- Export Buttons ---
+        excel_icon = make_excel_icon(22)
+
+        export3 = QPushButton(" Export >3-Month Gap List")
+        export3.setIcon(excel_icon)
+        export3.clicked.connect(lambda: self.export_gap_excel(3))
+        lay.addWidget(export3)
+
+        export6 = QPushButton(" Export >6-Month Gap List")
+        export6.setIcon(excel_icon)
+        export6.clicked.connect(lambda: self.export_gap_excel(6))
+        lay.addWidget(export6)
+
+        # --- Visualization for 3-Month Gap ---
+        if len(gap3) > 0:
+            chart3 = self.plot_gap_chart(gap3, "Gap Chart (>3 Months)")
+            lay.addWidget(chart3)
+
+        # --- Visualization for 6-Month Gap ---
+        if len(gap6) > 0:
+            chart6 = self.plot_gap_chart(gap6, "Gap Chart (>6 Months)")
+            lay.addWidget(chart6)
+
+        self.layout.addWidget(frame)
+
+    # ---------------------------------------------------------
+    # NEW FUNCTION — CREATE GAP VISUALIZATION
+    # ---------------------------------------------------------
+    def plot_gap_chart(self, series, title):
+        fig, ax = plt.subplots(figsize=(8, max(4, len(series) * 0.35)))
+
+        attendees = series.index.astype(str)
+        gaps_months = (series.values / 30).round(1)
+
+        bars = ax.barh(attendees, gaps_months, color="#C04000")
+
+        # Label inside bars
+        for bar, value in zip(bars, gaps_months):
+            ax.text(
+                bar.get_width() * 0.5,
+                bar.get_y() + bar.get_height() / 2,
+                f"{value} mo",
+                ha="center",
+                va="center",
+                color="white",
+                fontsize=9,
+                fontweight="bold"
+            )
+
+        # Force chart to have NO vertical padding (fixes blank white area)
+        ax.margins(y=0)
+
+        # Titles
+        ax.set_xlabel("Gap Length (Months)")
+        ax.set_ylabel("Attendee ID")
+        ax.set_title(title, pad=10, fontsize=12, fontweight="bold")
+
+        ax.invert_yaxis()
+
+        # Extra space for top axis
+        fig.subplots_adjust(top=0.90)
+
+        # Add secondary top axis
+        ax2 = ax.secondary_xaxis('top')
+        ax2.set_xlabel("Gap Length (Months)")
+
+        plt.tight_layout(pad=0.2)
+
+        canvas = FigureCanvas(fig)
+        return canvas
+
+    # ---------------------------------------------------------
+    # GAP EXPORT FUNCTION
+    # ---------------------------------------------------------
+    def export_gap_excel(self, months):
+        df = self.df.sort_values(["Attendee ID", "Date"]).copy()
+
+        df["Prev"] = df.groupby("Attendee ID")["Date"].shift(1)
+        df["GapDays"] = (df["Date"] - df["Prev"]).dt.days
+
+        threshold = 90 if months == 3 else 183
+        filename = "gap_over_3_months.xlsx" if months == 3 else "gap_over_6_months.xlsx"
+
+        gap_df = df[df["GapDays"] > threshold].copy()
+
+        cols = ["Attendee ID", "Gender", "Ward", "Prev", "Date", "GapDays"]
+        export_cols = [c for c in cols if c in gap_df.columns]
+
+        final_df = gap_df[export_cols].copy()
+        final_df.rename(columns={
+            "Prev": "Gap Start Date",
+            "Date": "Gap End Date",
+            "GapDays": "Gap (Days)"
+        }, inplace=True)
+
+        final_df.sort_values(by="Gap (Days)", ascending=False, inplace=True)
+
+        folder = "Gap Analysis Excels"
         os.makedirs(folder, exist_ok=True)
-        export_file = os.path.join(folder, f"retention_report_{dynamic_sessions}.xlsx")
+        path = os.path.join(folder, filename)
 
-        # Filter retained participants
-        df_retained = df_eligible[df_eligible["Attendee ID"].isin(retained)]
+        final_df.to_excel(path, index=False)
 
-        # Select relevant columns
-        export_cols = [
-            "Attendee ID",
-            "Gender",
-            "RajiNewColumn-Age",
-            "Date",
-            "Activity type"
-        ]
-        available_cols = [c for c in export_cols if c in df_retained.columns]
-        df_export = df_retained[available_cols].copy()
-
-        # Optional: sort by Attendee ID and Date
-        df_export.sort_values(by=["Attendee ID", "Date"], inplace=True)
-
-        # Export to Excel
-        df_export.to_excel(export_file, index=False)
-
-        # Auto-open file
-        if sys.platform == "win32":
-            os.startfile(export_file)
+        if sys.platform.startswith("win"):
+            os.startfile(path)
         elif sys.platform == "darwin":
-            os.system(f"open '{export_file}'")
+            os.system(f"open '{path}'")
         else:
-            os.system(f"xdg-open '{export_file}'")
+            os.system(f"xdg-open '{path}'")
 
-    def run_geospatial(self):
-        self.run_geo_btn.setEnabled(False)
-        self.run_geo_btn.setText("Opening Ward Geospatial Mapping...")
-        self.geo_process = QProcess(self)
-        self.geo_process.finished.connect(self.enable_geo_button)
+    # ---------------------------------------------------------
+    # GEOSPATIAL BUTTON
+    # ---------------------------------------------------------
+    def launch_geospatial(self):
+        self.geo_btn.setEnabled(False)
+        self.geo_btn.setText("Opening Ward Geospatial Mapping...")
+
+        if self.geo_process is None:
+            self.geo_process = QProcess(self)
+
+        self.geo_process.finished.connect(self._geo_complete)
         self.geo_process.start(sys.executable, ["ward-geospatial-mapping.py"])
 
-    def enable_geo_button(self):
-        self.run_geo_btn.setEnabled(True)
-        self.run_geo_btn.setText("Run Ward Geospatial Mapping")
+    def _geo_complete(self):
+        self.geo_btn.setEnabled(True)
+        self.geo_btn.setText("Run Ward Geospatial Mapping")
 
 
+# ---------------- RUN ----------------
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app_window = RetentionApp()
-    app_window.showMaximized()
+    win = RetentionApp()
+    win.showMaximized()
     sys.exit(app.exec_())
