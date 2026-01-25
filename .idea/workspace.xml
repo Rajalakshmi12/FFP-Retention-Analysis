@@ -7,8 +7,10 @@
     <list default="true" id="eab32074-a76c-4442-8a76-a3bf98a13a11" name="Changes" comment="Committing both the main and pyqt5UI along with Geo spatial mapping working with right geojson mapping">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Documents/Ward_Info.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Documents/Ward_Info.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gap Analysis Excels/gap_over_3_months.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Gap Analysis Excels/gap_over_3_months.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyqt5UI-chart-with-map.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyqt5UI-chart-with-map.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trend_summary.py" beforeDir="false" afterPath="$PROJECT_DIR$/trend_summary.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ward_map.html" beforeDir="false" afterPath="$PROJECT_DIR$/ward_map.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,6 +40,10 @@
     &quot;accountId&quot;: &quot;92d5d606-4f74-4cf7-8ee0-004759fa08fc&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -59,13 +65,14 @@
     &quot;Python.pyqt5UI-1.executor&quot;: &quot;Run&quot;,
     &quot;Python.pyqt5UI-2.executor&quot;: &quot;Run&quot;,
     &quot;Python.pyqt5UI-chart-2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pyqt5UI-chart-with-map.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.pyqt5UI-chart-with-map.executor&quot;: &quot;Run&quot;,
     &quot;Python.pyqt5UI-chatgpt-3.executor&quot;: &quot;Run&quot;,
     &quot;Python.pyqt5UI.executor&quot;: &quot;Run&quot;,
     &quot;Python.retention-trend.executor&quot;: &quot;Run&quot;,
     &quot;Python.study.executor&quot;: &quot;Run&quot;,
     &quot;Python.trend_summary.executor&quot;: &quot;Run&quot;,
     &quot;Python.ward-geospatial-mapping.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -82,7 +89,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-f69e5c277ee4-cbfc7b97e6b2-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-252.27397.106" />
+        <option value="bundled-python-sdk-f2b7a9f6281b-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.142" />
       </set>
     </attachedChunks>
   </component>
@@ -192,7 +199,23 @@
       <option name="project" value="LOCAL" />
       <updated>1762608955795</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Committing both the main and pyqt5UI along with Geo spatial mapping working with right geojson mapping">
+      <option name="closed" value="true" />
+      <created>1765236401875</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1765236401875</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Committing both the main and pyqt5UI along with Geo spatial mapping working with right geojson mapping">
+      <option name="closed" value="true" />
+      <created>1765236421080</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1765236421080</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -1,16 +1,16 @@
 # trend_summary.py
 # -------------------------------------------------------
-# Compares participation between first 30 days and last 30 days
-# of the latest 60-day window in the dataset
+# Compares participation between first 3 months and last 3 months
+# of the latest 6-month window in the dataset
 # + Includes IMD & Ward-based dropout summary
 # + Adds Weekday Attendance Weightage Summary
-# + Adds corrected 3 & 6 month dropout duration summary
+# + Adds corrected 3 & 6 month dropout duration summary (scoped to 6-month window)
 # + Adds Dropout Characteristics (Gender, Age, Constituency)
+# + Adds Dropout RATE (%) by Gender, Age, Constituency (dropouts / participants in first 3 months)
 # -------------------------------------------------------
 
 import pandas as pd
 import os
-from datetime import timedelta
 
 
 def generate_trend_summary():
@@ -33,25 +33,37 @@ def generate_trend_summary():
             df = df[~df[col].isin(["", "nan", "None", "Not provided", "Not Provided"])]
 
     latest_date = df["Date"].max().normalize()
-    start_date = latest_date - timedelta(days=60)
-    mid_date = start_date + timedelta(days=30)
+
+    # ---------------------------
+    # Latest 6-month window split into 3 + 3 months
+    # ---------------------------
+    start_date = (latest_date - pd.DateOffset(months=6)).normalize()
+    mid_date = (start_date + pd.DateOffset(months=3)).normalize()
 
     df_window = df[(df["Date"] >= start_date) & (df["Date"] <= latest_date)]
-    df_first30 = df_window[df_window["Date"] < mid_date]
-    df_last30 = df_window[df_window["Date"] >= mid_date]
+    df_first3 = df_window[df_window["Date"] < mid_date]
+    df_last3 = df_window[df_window["Date"] >= mid_date]
 
     summary_text = (
-        f"📆 Participation Comparison (Last 60 Days Window)\n"
+        f"📆 Participation Comparison (Last 6 Months Window)\n"
         f"Period: {start_date.date()} → {latest_date.date()}\n"
+        f"Split: {start_date.date()} → {(mid_date - pd.Timedelta(days=1)).date()}  vs  {mid_date.date()} → {latest_date.date()}\n"
         + "-" * 65 + "\n\n"
     )
 
     # ---------------------------
-    # Helper Function
+    # Helper Function: Trends
     # ---------------------------
-    def compare_categories(df_first, df_last, col, label,
-                           show_top=False, show_all=False,
-                           top_n=2, wording="Participation in {}"):
+    def compare_categories(
+        df_first,
+        df_last,
+        col,
+        label,
+        show_top=False,
+        show_all=False,
+        top_n=2,
+        wording="Participation in {}",
+    ):
         prev_counts = df_first.groupby(col)["Attendee ID"].nunique()
         last_counts = df_last.groupby(col)["Attendee ID"].nunique()
 
@@ -73,7 +85,7 @@ def generate_trend_summary():
         if not changes:
             return f"No valid data for {label}.\n"
 
-        lines = [f"{label} Highlights (First 30 days → Last 30 days):"]
+        lines = [f"{label} Highlights (First 3 months → Last 3 months):"]
 
         if show_top == "absolute":
             top_shift = sorted(changes, key=lambda x: x[3], reverse=True)[:top_n]
@@ -89,9 +101,13 @@ def generate_trend_summary():
                 if abs(pct_change) < 1:
                     lines.append(f"• {wording.format(c)} remained steady ({prev_val} → {last_val})")
                 elif pct_change > 0:
-                    lines.append(f"• {wording.format(c)} increased by {abs(pct_change):.1f}% ({prev_val} → {last_val})")
+                    lines.append(
+                        f"• {wording.format(c)} increased by {abs(pct_change):.1f}% ({prev_val} → {last_val})"
+                    )
                 else:
-                    lines.append(f"• {wording.format(c)} decreased by {abs(pct_change):.1f}% ({prev_val} → {last_val})")
+                    lines.append(
+                        f"• {wording.format(c)} decreased by {abs(pct_change):.1f}% ({prev_val} → {last_val})"
+                    )
 
         else:
             for c, prev_val, last_val, abs_change, pct_change in changes:
@@ -106,48 +122,104 @@ def generate_trend_summary():
         return "\n".join(lines) + "\n"
 
     # ---------------------------
-    # Gender Trend
+    # Helper Function: Dropout Rate table
     # ---------------------------
-    if "Gender" in df.columns:
+    def dropout_rate_summary(df_first_period, dropout_df, col, label, top_n=5):
+        """
+        Dropout rate is calculated as:
+          dropouts_in_group / participants_in_group (from first period) * 100
+        """
+        if col not in df_first_period.columns or col not in dropout_df.columns:
+            return ""
+
+        participants = df_first_period.groupby(col)["Attendee ID"].nunique()
+        dropouts = dropout_df.groupby(col)["Attendee ID"].nunique()
+
+        rate_df = (
+            pd.DataFrame({"Participants": participants, "Dropouts": dropouts})
+            .fillna(0)
+            .reset_index()
+            .rename(columns={col: label})
+        )
+        rate_df["Participants"] = rate_df["Participants"].astype(int)
+        rate_df["Dropouts"] = rate_df["Dropouts"].astype(int)
+        rate_df["DropoutRatePct"] = rate_df.apply(
+            lambda r: (r["Dropouts"] / r["Participants"] * 100) if r["Participants"] > 0 else 0.0,
+            axis=1
+        )
+
+        # Remove groups with 0 participants (shouldn't happen, but safe)
+        rate_df = rate_df[rate_df["Participants"] > 0]
+
+        if rate_df.empty:
+            return ""
+
+        # Top risk groups
+        top = rate_df.sort_values(["DropoutRatePct", "Dropouts"], ascending=[False, False]).head(top_n)
+
+        lines = [f"📉 Dropout Rate by {label} (Dropouts / Participants in first 3 months):"]
+        for _, r in top.iterrows():
+            lines.append(
+                f"• {r[label]}: {r['DropoutRatePct']:.1f}% "
+                f"({r['Dropouts']} / {r['Participants']})"
+            )
+
+        return "\n".join(lines) + "\n\n"
+
+    # ---------------------------
+    # Gender Trend (6-month window)
+    # ---------------------------
+    if "Gender" in df_window.columns:
+        summary_text += compare_categories(df_first3, df_last3, "Gender", "Gender") + "\n"
+
+    # ---------------------------
+    # Activity Trend (6-month window)
+    # ---------------------------
+    if "Activity type" in df_window.columns:
         summary_text += compare_categories(
-            df_first30, df_last30, "Gender", "Gender"
+            df_first3,
+            df_last3,
+            "Activity type",
+            "Activity",
+            show_all=True,
+            wording="Participation in {} Activity",
         ) + "\n"
 
     # ---------------------------
-    # Activity Trend
+    # Age Bucket Trend (6-month window)
     # ---------------------------
-    if "Activity type" in df.columns:
+    if "RajiNewColumn-Range" in df_window.columns:
         summary_text += compare_categories(
-            df_first30, df_last30, "Activity type", "Activity",
-            show_all=True, wording="Participation in {} Activity"
+            df_first3,
+            df_last3,
+            "RajiNewColumn-Range",
+            "Age Bucket",
+            show_all=True,
+            wording="Participation among {} age group",
         ) + "\n"
 
     # ---------------------------
-    # Age Bucket Trend
+    # Constituency Trend (Top 5) (6-month window)
     # ---------------------------
-    if "RajiNewColumn-Range" in df.columns:
+    if "Constituency" in df_window.columns:
         summary_text += compare_categories(
-            df_first30, df_last30, "RajiNewColumn-Range", "Age Bucket",
-            show_all=True, wording="Participation among {} age group"
+            df_first3,
+            df_last3,
+            "Constituency",
+            "Constituency",
+            show_top="absolute",
+            top_n=5,
         ) + "\n"
 
     # ---------------------------
-    # Constituency Trend (Top 5)
+    # IMD Dropout Trend + Characteristics (within 6-month window)
+    # + Dropout Rate by Gender/Age/Constituency
     # ---------------------------
-    if "Constituency" in df.columns:
-        summary_text += compare_categories(
-            df_first30, df_last30, "Constituency", "Constituency",
-            show_top="absolute", top_n=5
-        ) + "\n"
-
-    # ---------------------------
-    # IMD Dropout Trend + Characteristics
-    # ---------------------------
-    if {"IMD rank", "Ward", "Attendee ID"}.issubset(df.columns):
-        first_ids = set(df_first30["Attendee ID"].unique())
-        last_ids = set(df_last30["Attendee ID"].unique())
+    if {"IMD rank", "Ward", "Attendee ID"}.issubset(df_window.columns):
+        first_ids = set(df_first3["Attendee ID"].unique())
+        last_ids = set(df_last3["Attendee ID"].unique())
         dropout_ids = first_ids - last_ids
-        dropout_df = df_first30[df_first30["Attendee ID"].isin(dropout_ids)]
+        dropout_df = df_first3[df_first3["Attendee ID"].isin(dropout_ids)]
 
         if not dropout_df.empty:
             imd_ward_counts = (
@@ -165,10 +237,22 @@ def generate_trend_summary():
                     f"→ {int(row['Dropouts'])} dropouts\n"
                 )
 
-            # --- Dropout characteristics ---
-            gender_top = dropout_df["Gender"].mode()[0] if "Gender" in dropout_df.columns and not dropout_df["Gender"].dropna().empty else "N/A"
-            age_top = dropout_df["RajiNewColumn-Range"].mode()[0] if "RajiNewColumn-Range" in dropout_df.columns and not dropout_df["RajiNewColumn-Range"].dropna().empty else "N/A"
-            const_top = dropout_df["Constituency"].mode()[0] if "Constituency" in dropout_df.columns and not dropout_df["Constituency"].dropna().empty else "N/A"
+            # --- Dropout characteristics (mode) ---
+            gender_top = (
+                dropout_df["Gender"].mode()[0]
+                if "Gender" in dropout_df.columns and not dropout_df["Gender"].dropna().empty
+                else "N/A"
+            )
+            age_top = (
+                dropout_df["RajiNewColumn-Range"].mode()[0]
+                if "RajiNewColumn-Range" in dropout_df.columns and not dropout_df["RajiNewColumn-Range"].dropna().empty
+                else "N/A"
+            )
+            const_top = (
+                dropout_df["Constituency"].mode()[0]
+                if "Constituency" in dropout_df.columns and not dropout_df["Constituency"].dropna().empty
+                else "N/A"
+            )
 
             summary_text += (
                 "\n📊 Dropout Characteristics Summary:\n"
@@ -176,16 +260,25 @@ def generate_trend_summary():
                 f"• Most common age range among dropouts: {age_top}\n"
                 f"• Top constituency with highest dropouts: {const_top}\n\n"
             )
+
+            # --- Dropout rate summaries (risk-based) ---
+            summary_text += dropout_rate_summary(df_first3, dropout_df, "Gender", "Gender", top_n=10)
+            summary_text += dropout_rate_summary(df_first3, dropout_df, "RajiNewColumn-Range", "Age Range", top_n=10)
+            summary_text += dropout_rate_summary(df_first3, dropout_df, "Constituency", "Constituency", top_n=10)
+
         else:
             summary_text += "No IMD dropout data found in the current window.\n\n"
 
     # ---------------------------
-    # Weekday Attendance Weightage
+    # Weekday Attendance Weightage (6-month window)
     # ---------------------------
-    if {"Date", "Attendee ID"}.issubset(df.columns):
-        df["Weekday"] = df["Date"].dt.day_name()
-        unique_attendance = df.groupby(["Date", "Attendee ID"]).size().reset_index(name="Sessions")
+    if {"Date", "Attendee ID"}.issubset(df_window.columns):
+        tmp = df_window.copy()
+        tmp["Weekday"] = tmp["Date"].dt.day_name()
+
+        unique_attendance = tmp.groupby(["Date", "Attendee ID"]).size().reset_index(name="Sessions")
         unique_attendance = unique_attendance.drop_duplicates(subset=["Date", "Attendee ID"])
+
         weekday_counts = unique_attendance["Date"].dt.day_name().value_counts(normalize=True) * 100
         weekday_counts = weekday_counts.reindex(
             ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -196,16 +289,16 @@ def generate_trend_summary():
             summary_text += f"• {day}: {pct:.1f}% of total unique attendances\n"
 
     # ---------------------------
-    # Drop-off Duration Summary (corrected 3 & 6 months)
+    # Drop-off Duration Summary (3 & 6 months) - scoped to 6-month window
     # ---------------------------
-    if {"Date", "Attendee ID"}.issubset(df.columns):
-        attendance = df.groupby("Attendee ID")["Date"].agg(["min", "max"]).reset_index()
+    if {"Date", "Attendee ID"}.issubset(df_window.columns):
+        attendance = df_window.groupby("Attendee ID")["Date"].agg(["min", "max"]).reset_index()
         attendance.rename(columns={"min": "FirstSession", "max": "LastSession"}, inplace=True)
         attendance["MonthsActive"] = (attendance["LastSession"] - attendance["FirstSession"]) / pd.Timedelta(days=30)
 
-        latest_date = df["Date"].max()
-        cutoff_3 = latest_date - pd.DateOffset(months=3)
-        cutoff_6 = latest_date - pd.DateOffset(months=6)
+        latest_in_window = df_window["Date"].max()
+        cutoff_3 = latest_in_window - pd.DateOffset(months=3)
+        cutoff_6 = latest_in_window - pd.DateOffset(months=6)
 
         valid_3 = attendance[attendance["FirstSession"] <= cutoff_3]
         valid_6 = attendance[attendance["FirstSession"] <= cutoff_6]

@@ -68,13 +68,13 @@ btn3 = ttk.Button(frame, text="📉  Dropout Trend Analysis",
                   width=50)
 btn3.pack(pady=10)
 
-btn4 = ttk.Button(frame, text="🧾  Generate Summary - Last 2 months",
+btn4 = ttk.Button(frame, text="🧾  Generate Summary - Last 6 months",
                   command=show_summary, width=50)
 btn4.pack(pady=10)
 
 summary_box = scrolledtext.ScrolledText(frame, wrap=tk.WORD, width=70, height=12, font=("Consolas", 10))
 summary_box.pack(pady=10)
-summary_box.insert(tk.END, "Click 'Generate Summary' to view the latest 2 months trends here...")
+summary_box.insert(tk.END, "Click 'Generate Summary' to view the latest 6 months trends here...")
 summary_box.config(state="disabled")
 
 ttk.Button(frame, text="❌ Exit", command=root.destroy).pack(pady=10)
