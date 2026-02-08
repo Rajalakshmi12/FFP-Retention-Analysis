@@ -8,9 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Documents/Ward_Info.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Documents/Ward_Info.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Gap Analysis Excels/gap_over_3_months.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Gap Analysis Excels/gap_over_3_months.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyqt5UI-chart-with-map.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyqt5UI-chart-with-map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trend_summary.py" beforeDir="false" afterPath="$PROJECT_DIR$/trend_summary.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gap Analysis Excels/gap_over_6_months.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Gap Analysis Excels/gap_over_6_months.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ward_map.html" beforeDir="false" afterPath="$PROJECT_DIR$/ward_map.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -215,7 +213,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765236421080</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Committing both the main and pyqt5UI along with Geo spatial mapping working with right geojson mapping">
+      <option name="closed" value="true" />
+      <created>1769374701884</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1769374701884</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
