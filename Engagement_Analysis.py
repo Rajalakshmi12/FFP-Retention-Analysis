@@ -10,7 +10,7 @@ from matplotlib.gridspec import GridSpec
 # -----------------------------
 # 1. Load Excel
 # -----------------------------
-df = pd.read_excel("Documents/Mar24_Mar25_Cleansed.xlsx", sheet_name="Main")
+df = pd.read_excel("Documents/FFP_cleansed.xlsx", sheet_name="Main")
 required = {"Attendee ID", "Activity ID", "Date"}
 if not required.issubset(df.columns):
     raise ValueError(f"Excel must contain: {required}")

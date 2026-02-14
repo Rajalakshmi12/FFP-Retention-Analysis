@@ -7,7 +7,7 @@ import webbrowser
 # -----------------------------
 # 1. File configuration
 # -----------------------------
-file_path = "Mar24_Mar25.xlsx"         # Input Excel
+file_path = "Documents/FFP_cleansed.xlsx"         # Input Excel
 geojson_file = "Ward_UK.geojson"       # ONS Wards GeoJSON (Dec 2024 UK BGC)
 output_file = "Documents/Ward_Info.xlsx"  # Output Excel
 

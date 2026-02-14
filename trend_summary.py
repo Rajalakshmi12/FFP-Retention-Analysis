@@ -14,7 +14,7 @@ import os
 
 
 def generate_trend_summary():
-    FILE_PATH = "Documents/Mar24_Mar25_Cleansed.xlsx"
+    FILE_PATH = "Documents/FFP_cleansed.xlsx"
     SHEET = "Main"
 
     if not os.path.exists(FILE_PATH):

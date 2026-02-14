@@ -9,7 +9,7 @@
 import pandas as pd
 import numpy as np
 
-FILE_PATH = "Documents/Mar24_Mar25_Cleansed.xlsx"
+FILE_PATH = "Documents/FFP_cleansed.xlsx"
 SHEET = "Main"
 
 def generate_descriptive_summary():

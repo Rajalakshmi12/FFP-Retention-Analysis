@@ -16,7 +16,7 @@ plt.ion()  # ✅ interactive mode so multiple charts stay open
 
 
 def run_retention_trend():
-    FILE_PATH = "Documents/Mar24_Mar25_Cleansed.xlsx"
+    FILE_PATH = "Documents/FFP_cleansed.xlsx"
     SHEET = "Main"
 
     if not os.path.exists(FILE_PATH):

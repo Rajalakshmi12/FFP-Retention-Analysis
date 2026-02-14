@@ -57,7 +57,7 @@ class RetentionApp(QWidget):
         main.addWidget(scroll)
 
         # ---------------- LOAD DATA ----------------
-        df = pd.read_excel("Documents/Mar24_Mar25_Cleansed.xlsx", sheet_name="Main")
+        df = pd.read_excel("Documents/FFP_cleansed.xlsx", sheet_name="Main")
         df["Date"] = pd.to_datetime(df["Date"])
         self.df = df
 
